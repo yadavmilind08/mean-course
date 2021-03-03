@@ -2,12 +2,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
-const Post = require("./models/post");
+const postRoutes = require("./routes/posts");
 
 const app = express();
 
+// node-angular is database name and posts is collection name as we have post model and it's plural is posts
 const databaseUri =
-  "mongodb+srv://max:3PonKLD9aF2MVHLt@cluster0.mupyq.mongodb.net/node-angular?retryWrites=true&w=majority";
+  "mongodb+srv://max:M79ykpko1637UWnn@cluster0.mupyq.mongodb.net/node-angular?retryWrites=true&w=majority";
 
 mongoose
   .connect(databaseUri, {
@@ -16,7 +17,7 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => console.log("Database Connected"))
-  .catch((err) => console.log("Connection Failed", err));
+  .catch((err) => console.log("Connection Failed ", err));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -34,54 +35,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post("/api/posts", (req, res, next) => {
-  const post = new Post({
-    title: req.body.title,
-    content: req.body.content,
-  });
-  post.save().then((createdPost) => {
-    res.status(201).json({
-      message: "Post added successfully",
-      postId: createdPost._id,
-    });
-  });
-});
-
-app.get("/api/posts", (req, res, next) => {
-  Post.find().then((documents) => {
-    res.status(200).json({
-      message: "Posts fetched successfully!",
-      posts: documents,
-    });
-  });
-});
-
-app.get("/api/posts/:id", (req, res, next) => {
-  Post.findById(req.params.id).then((post) => {
-    if (post) {
-      res.status(200).json(post);
-    } else {
-      res.status(404).json({ message: "Post not found" });
-    }
-  });
-});
-
-app.put("/api/posts/:id", (req, res, next) => {
-  const post = new Post({
-    _id: req.params.id,
-    title: req.params.title,
-    content: req.params.content,
-  });
-  Post.updateOne({ _id: req.params.id }, post).then((result) => {
-    res.status(200).json({ message: "Update successful!" });
-  });
-});
-
-app.delete("/api/posts/:id", (req, res, next) => {
-  Post.deleteOne({ _id: req.params.id }).then((result) => {
-    console.log(result);
-    res.status(200).json({ message: "Post deleted!" });
-  });
-});
+app.use("/api/posts", postRoutes);
 
 module.exports = app;
