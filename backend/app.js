@@ -10,7 +10,9 @@ const app = express();
 
 // node-angular is database name and posts is collection name as we have post model and it's plural is posts
 const databaseUri =
-  "mongodb+srv://max:M79ykpko1637UWnn@cluster0.mupyq.mongodb.net/node-angular?retryWrites=true&w=majority";
+  "mongodb+srv://max:" +
+  process.env.MONGO_ATLAS_PW +
+  "@cluster0.mupyq.mongodb.net/node-angular?retryWrites=true&w=majority";
 
 mongoose
   .connect(databaseUri, {
